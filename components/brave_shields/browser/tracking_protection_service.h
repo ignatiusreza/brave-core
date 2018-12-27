@@ -88,7 +88,6 @@ class TrackingProtectionService : public BaseBraveShieldsService {
 
   SEQUENCE_CHECKER(sequence_checker_);
   std::vector<std::string> first_party_storage_trackers_;
-  bool first_party_storage_trackers_initailized_;
 
   base::WeakPtrFactory<TrackingProtectionService> weak_factory_;
   DISALLOW_COPY_AND_ASSIGN(TrackingProtectionService);

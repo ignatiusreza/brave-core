@@ -27,25 +27,28 @@ class TrackingProtectionHelper : public content::WebContentsObserver,
     ~TrackingProtectionHelper() override;
     void DidStartNavigation(content::NavigationHandle* 
       navigation_handle) override;
-    static GURL GetStartingSiteURLFromRenderFrameInfo(int render_process_id, 
+    GURL GetStartingSiteURLFromRenderFrameInfo(int render_process_id,
       int render_frame_id);
     void RenderFrameHostChanged(content::RenderFrameHost* old_host,
                               content::RenderFrameHost* new_host) override;
+    void RenderFrameDeleted(content::RenderFrameHost* render_frame_host) override;
+    static void CreateForWebContents(content::WebContents* web_contents);
 
   protected:
     struct RenderFrameIdKey {
       RenderFrameIdKey();
       RenderFrameIdKey(int render_process_id, int frame_routing_id);
 
-    int render_process_id;
-    int frame_routing_id;
+      int render_process_id;
+      int frame_routing_id;
 
-    bool operator<(const RenderFrameIdKey& other) const;
-    bool operator==(const RenderFrameIdKey& other) const;
-  };
+      bool operator<(const RenderFrameIdKey& other) const;
+      bool operator==(const RenderFrameIdKey& other) const;
+    };
 
-  static std::map<RenderFrameIdKey, GURL> render_frame_key_to_starting_site_url;
-  static base::Lock frame_data_map_lock_;
+  private:
+    std::map<RenderFrameIdKey, GURL> render_frame_key_to_starting_site_url;
+    base::Lock frame_data_map_lock_;
 
   DISALLOW_COPY_AND_ASSIGN(TrackingProtectionHelper);
 };

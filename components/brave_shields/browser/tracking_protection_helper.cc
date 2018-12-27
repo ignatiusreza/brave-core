@@ -9,18 +9,12 @@
 #include "content/public/browser/render_process_host.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/web_contents_user_data.h"
-#include "ui/base/page_transition_types.h"
 
 using content::NavigationHandle;
 using content::RenderFrameHost;
 using content::WebContents;
 
 namespace brave_shields {
-
-base::Lock TrackingProtectionHelper::frame_data_map_lock_;
-
-std::map<TrackingProtectionHelper::RenderFrameIdKey, GURL>
-    TrackingProtectionHelper::render_frame_key_to_starting_site_url;
 
 TrackingProtectionHelper::RenderFrameIdKey::RenderFrameIdKey()
     : render_process_id(content::ChildProcessHost::kInvalidUniqueID),
@@ -59,7 +53,7 @@ void TrackingProtectionHelper::DidStartNavigation(NavigationHandle* handle) {
 
   const RenderFrameIdKey key(rfh->GetProcess()->GetID(), rfh->GetRoutingID());
 
-  if (handle && !ui::PageTransitionIsRedirect(handle->GetPageTransition())) {
+  if (!ui::PageTransitionIsRedirect(handle->GetPageTransition())) {
     std::map<RenderFrameIdKey, GURL>::iterator iter =
         render_frame_key_to_starting_site_url.find(key);
     if (iter != render_frame_key_to_starting_site_url.end()) {
@@ -69,6 +63,17 @@ void TrackingProtectionHelper::DidStartNavigation(NavigationHandle* handle) {
         std::pair<RenderFrameIdKey, GURL>(key, handle->GetURL()));
   }
   return;
+}
+
+void TrackingProtectionHelper::RenderFrameDeleted(RenderFrameHost* 
+  render_frame_host) {
+  const RenderFrameIdKey key(render_frame_host->GetProcess()->GetID(), 
+    render_frame_host->GetRoutingID());
+  std::map<RenderFrameIdKey, GURL>::iterator iter =
+      render_frame_key_to_starting_site_url.find(key);
+  if (iter != render_frame_key_to_starting_site_url.end()) {
+    render_frame_key_to_starting_site_url.erase(key);
+  }
 }
 
 void TrackingProtectionHelper::RenderFrameHostChanged(
@@ -92,7 +97,6 @@ void TrackingProtectionHelper::RenderFrameHostChanged(
   }
 }
 
-// static
 GURL TrackingProtectionHelper::GetStartingSiteURLFromRenderFrameInfo(
     int render_process_id, int render_frame_id) {
   base::AutoLock lock(frame_data_map_lock_);
@@ -105,5 +109,15 @@ GURL TrackingProtectionHelper::GetStartingSiteURLFromRenderFrameInfo(
   return GURL();
 }
 
+// static
+void TrackingProtectionHelper::CreateForWebContents(
+    content::WebContents* web_contents) {
+  if (!TrackingProtectionHelper::FromWebContents(web_contents)) {
+    web_contents->SetUserData(
+        TrackingProtectionHelper::UserDataKey(),
+        base::WrapUnique(
+            new TrackingProtectionHelper(web_contents)));
+  }
+}
 
 }  // namespace brave_shields

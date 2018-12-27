@@ -13,6 +13,7 @@
 #include "base/macros.h"
 #include "base/memory/ptr_util.h"
 #include "base/strings/utf_string_conversions.h"
+#include "base/strings/string_split.h"
 #include "base/task/post_task.h"
 #include "base/threading/thread_restrictions.h"
 #include "brave/browser/brave_browser_process_impl.h"
@@ -24,6 +25,7 @@
 #include "brave/components/brave_shields/common/brave_shield_constants.h"
 #include "brave/vendor/tracking-protection/TPParser.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
+#include "content/browser/web_contents/web_contents_impl.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/browser_thread.h"
@@ -58,7 +60,6 @@ TrackingProtectionService::TrackingProtectionService()
       "syndication.twitter.com",
       "cdn.syndication.twimg.com"
     }),
-    first_party_storage_trackers_initailized_(false),
     weak_factory_(this) {
   DETACH_FROM_SEQUENCE(sequence_checker_);
 }
@@ -118,15 +119,29 @@ void TrackingProtectionService::DispatchBlockedEvent(int render_process_id,
 bool TrackingProtectionService::ShouldStoreState(HostContentSettingsMap* map, 
   int render_process_id, int render_frame_id, const GURL& top_origin_url, 
   const GURL& origin_url) {
+  DCHECK_CURRENTLY_ON(BrowserThread::UI);
 
-  if (!first_party_storage_trackers_initailized_) {
-    LOG(INFO) << "First party storage trackers not initialized";
+  if(first_party_storage_trackers_.empty()) {
+    LOG(INFO) << "First party storage trackers list is empty";
     return true;
-  }  
+  }
+
   std::string host = origin_url.host();
 
+  content::WebContents *web_contents = content::WebContentsImpl::
+    FromRenderFrameHostID(render_process_id, render_frame_id);
+  if (!web_contents) {
+    return true;
+  }
+
+  TrackingProtectionHelper *tph = TrackingProtectionHelper::FromWebContents(
+    web_contents);
+  if (!tph) {
+    return true;
+  }
+
   GURL starting_site = 
-    TrackingProtectionHelper::GetStartingSiteURLFromRenderFrameInfo(
+    tph->GetStartingSiteURLFromRenderFrameInfo(
       render_process_id, render_frame_id);
 
   bool allow_brave_shields = starting_site == GURL() ? false : 
@@ -165,20 +180,16 @@ void TrackingProtectionService::ParseStorageTrackersData() {
     return;
   }
 
-  std::stringstream st(std::string(storage_trackers_buffer_.begin(), 
-    storage_trackers_buffer_.end()));
-  std::string tracker;
-
-  while(std::getline(st, tracker, ',')) {
-    first_party_storage_trackers_.push_back(tracker);
-  }
+  std::string trackers(storage_trackers_buffer_.begin(),
+    storage_trackers_buffer_.end());
+  first_party_storage_trackers_ = base::SplitString(
+    base::StringPiece(trackers.data(), trackers.size()), ",",
+    base::TRIM_WHITESPACE, base::SPLIT_WANT_NONEMPTY);
 
   if(first_party_storage_trackers_.empty()) {
     LOG(ERROR) << "No first party trackers found";
     return;
   }
-
-  first_party_storage_trackers_initailized_ = true;
 }
 
 bool TrackingProtectionService::Init() {

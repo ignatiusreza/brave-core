@@ -28,7 +28,21 @@ class BraveRenderMessageFilter : public ChromeRenderMessageFilter {
                        const base::string16& display_name,
                        bool* allowed);
 
+  void OnAllowDatabaseInternal(int render_frame_id,
+                       const GURL& origin_url,
+                       const GURL& top_origin_url,
+                       const base::string16& name,
+                       const base::string16& display_name,
+                       bool* allowed);
+
+
   void OnAllowDOMStorage(int render_frame_id,
+                         const GURL& origin_url,
+                         const GURL& top_origin_url,
+                         bool local,
+                         bool* allowed);
+
+  void OnAllowDOMStorageInternal(int render_frame_id,
                          const GURL& origin_url,
                          const GURL& top_origin_url,
                          bool local,
@@ -37,7 +51,11 @@ class BraveRenderMessageFilter : public ChromeRenderMessageFilter {
   void OnAllowIndexedDB(int render_frame_id,
                         const GURL& origin_url,
                         const GURL& top_origin_url,
-                        const base::string16& name,
+                        bool* allowed);
+
+  void OnAllowIndexedDBInternal(int render_frame_id,
+                        const GURL& origin_url,
+                        const GURL& top_origin_url,
                         bool* allowed);
 
   HostContentSettingsMap *host_content_settings_map_;
