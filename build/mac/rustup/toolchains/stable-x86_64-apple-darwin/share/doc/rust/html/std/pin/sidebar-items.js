@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Pin","A pinned pointer."]],"trait":[["Unpin","Types which can be safely moved after being pinned."]]});
