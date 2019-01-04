@@ -1,0 +1,8 @@
+rustc-x86_64-unknown-linux-gnu
+rust-std-x86_64-unknown-linux-gnu
+cargo-x86_64-unknown-linux-gnu
+rust-docs-x86_64-unknown-linux-gnu
+rust-std-x86_64-linux-android
+rust-std-arm-linux-androideabi
+rust-std-i686-linux-android
+rust-std-aarch64-linux-android

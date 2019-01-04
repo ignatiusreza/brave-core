@@ -1,0 +1,33 @@
+config_version = "1"
+
+[[components]]
+pkg = "rustc"
+target = "x86_64-unknown-linux-gnu"
+
+[[components]]
+pkg = "rust-std"
+target = "x86_64-unknown-linux-gnu"
+
+[[components]]
+pkg = "cargo"
+target = "x86_64-unknown-linux-gnu"
+
+[[components]]
+pkg = "rust-docs"
+target = "x86_64-unknown-linux-gnu"
+
+[[components]]
+pkg = "rust-std"
+target = "aarch64-linux-android"
+
+[[components]]
+pkg = "rust-std"
+target = "i686-linux-android"
+
+[[components]]
+pkg = "rust-std"
+target = "arm-linux-androideabi"
+
+[[components]]
+pkg = "rust-std"
+target = "x86_64-linux-android"

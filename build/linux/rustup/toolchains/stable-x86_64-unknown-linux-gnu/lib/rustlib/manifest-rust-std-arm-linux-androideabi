@@ -1,0 +1,16 @@
+file:lib/rustlib/arm-linux-androideabi/lib/liblibc-d0b3565c39ede68e.rlib
+file:lib/rustlib/arm-linux-androideabi/lib/libstd-cd33df8f773a8d34.rlib
+file:lib/rustlib/arm-linux-androideabi/lib/libtest-69521d05599afa76.so
+file:lib/rustlib/arm-linux-androideabi/lib/libpanic_unwind-b4f2368c97086610.rlib
+file:lib/rustlib/arm-linux-androideabi/lib/libterm-908202716e5d489b.so
+file:lib/rustlib/arm-linux-androideabi/lib/libterm-908202716e5d489b.rlib
+file:lib/rustlib/arm-linux-androideabi/lib/libgetopts-ff1e6faf188c3818.rlib
+file:lib/rustlib/arm-linux-androideabi/lib/libunwind-4c51ac82f70822c1.rlib
+file:lib/rustlib/arm-linux-androideabi/lib/libcompiler_builtins-5f64e7823d30511e.rlib
+file:lib/rustlib/arm-linux-androideabi/lib/libtest-69521d05599afa76.rlib
+file:lib/rustlib/arm-linux-androideabi/lib/liballoc-ac8a19e2dea4f5a1.rlib
+file:lib/rustlib/arm-linux-androideabi/lib/libstd-cd33df8f773a8d34.so
+file:lib/rustlib/arm-linux-androideabi/lib/libcore-bc99d396b91fe14a.rlib
+file:lib/rustlib/arm-linux-androideabi/lib/libpanic_abort-ce592ea191b58149.rlib
+file:lib/rustlib/arm-linux-androideabi/lib/liballoc_jemalloc-daf4b30ba0aa7eb6.rlib
+file:lib/rustlib/arm-linux-androideabi/lib/liballoc_system-34fc26c16207806e.rlib
