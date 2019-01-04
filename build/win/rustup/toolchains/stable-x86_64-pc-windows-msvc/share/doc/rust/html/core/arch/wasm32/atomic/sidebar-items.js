@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["wait_i32","Corresponding intrinsic to wasm's [`i32.atomic.wait` instruction][instr]"],["wait_i64","Corresponding intrinsic to wasm's [`i64.atomic.wait` instruction][instr]"],["wake","Corresponding intrinsic to wasm's [`atomic.wake` instruction][instr]"]]});

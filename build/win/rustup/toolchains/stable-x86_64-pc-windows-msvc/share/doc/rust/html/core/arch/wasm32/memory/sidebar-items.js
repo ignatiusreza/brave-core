@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["grow","Corresponding intrinsic to wasm's [`memory.grow` instruction][instr]"],["size","Corresponding intrinsic to wasm's [`memory.size` instruction][instr]"]]});

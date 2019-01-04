@@ -1,0 +1,5 @@
+rustc-x86_64-pc-windows-msvc
+rust-std-x86_64-pc-windows-msvc
+cargo-x86_64-pc-windows-msvc
+rust-docs-x86_64-pc-windows-msvc
+rust-std-i686-pc-windows-msvc
