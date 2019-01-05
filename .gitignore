@@ -28,3 +28,7 @@ npm-debug.log
 CMakeLists.txt
 cmake-build-debug/
 coverage/
+/build/*/rustup/git/
+/build/*/rustup/downloads/
+/build/*/rustup/tmp/
+/build/*/rustup/registry/src/
