@@ -16,6 +16,7 @@ pipeline {
                 echo "${CHANGE_AUTHOR}"
                 echo "${CHANGE_AUTHOR_DISPLAY_NAME}"
                 // remove remote branch?
+                // if brave-core PR targets 0.59.x then clone brave-browser should checkout the matching branch
                 sh """
                     rm -rf brave-browser/
                     if [ ! -d brave-browser ]; then
