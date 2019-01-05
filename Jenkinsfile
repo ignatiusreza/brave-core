@@ -1,14 +1,11 @@
 pipeline {
     options {
-        // disable concurrent build per branch
         disableConcurrentBuilds()
-        // add timestamps to console log
         timestamps()
     }
     agent {
         node {
-            // label of node on which to build
-            label 'darwin-ci'
+            label 'mac-ci'
         }
     }
     stages {
@@ -56,13 +53,13 @@ pipeline {
                 }
             }
         }
-        stage('build-mac') {
+        stage('build') {
             steps {
                 // wait 5m for branch to be discovered?
                 script {
-                    def macResult = build(job: "brave-browser-build-pr-mac/brave-core-${GIT_BRANCH}", propagate: false, quietPeriod: 30).result
-                    echo "Building browser for mac result is ${macResult}"
-                    if(macResult == 'ABORTED') { currentBuild.result = 'FAILURE' } else { currentBuild.result = macResult }
+                    def buildResult = build(job: "brave-browser-build-pr/brave-core-${GIT_BRANCH}", propagate: false, quietPeriod: 30).result
+                    echo "Building browser result is ${buildResult}"
+                    if (buildResult == 'ABORTED') { currentBuild.result = 'FAILURE' } else { currentBuild.result = buildResult }
                 }
             }
         }
