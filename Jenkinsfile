@@ -4,9 +4,7 @@ pipeline {
         timestamps()
     }
     agent {
-        node {
-            label 'mac-ci'
-        }
+        node { label 'master' }
     }
     stages {
         stage('checkout') {
