@@ -54,6 +54,7 @@ pipeline {
         stage('build') {
             steps {
                 // wait 5m for branch to be discovered?
+                sleep(time: 5, unit: "MINUTES")
                 script {
                     def buildResult = build(job: "brave-browser-build-pr/brave-core-${GIT_BRANCH}", propagate: false, quietPeriod: 30).result
                     echo "Building browser result is ${buildResult}"
