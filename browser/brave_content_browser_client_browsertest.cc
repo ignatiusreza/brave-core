@@ -9,6 +9,8 @@
 #include "brave/common/brave_paths.h"
 #include "brave/common/extensions/extension_constants.h"
 #include "brave/components/brave_rewards/browser/buildflags/buildflags.h"
+#include "brave/components/brave_shields/common/brave_shield_constants.h"
+#include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser.h"
@@ -16,6 +18,7 @@
 #include "chrome/common/chrome_content_client.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
+#include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/test/browser_test_utils.h"
 #include "content/public/test/test_navigation_observer.h"
@@ -93,14 +96,16 @@ class BraveContentBrowserClientTest : public InProcessBrowserTest {
   const GURL& torrent_url() { return torrent_url_; }
   const GURL& torrent_extension_url() { return torrent_extension_url_; }
 
+  content::ContentBrowserClient* client() {
+    return browser_content_client_.get();
+  }
+
  private:
   GURL magnet_html_url_;
   GURL magnet_url_;
   GURL extension_url_;
   GURL torrent_url_;
   GURL torrent_extension_url_;
-  ContentSettingsPattern top_level_page_pattern_;
-  ContentSettingsPattern empty_pattern_;
   std::unique_ptr<ChromeContentClient> content_client_;
   std::unique_ptr<BraveContentBrowserClient> browser_content_client_;
 };
@@ -265,4 +270,48 @@ IN_PROC_BROWSER_TEST_F(BraveContentBrowserClientTest,
   EXPECT_STREQ(entry->GetURL().spec().c_str(),
                torrent_extension_url().spec().c_str())
       << "No changes on the real URL";
+}
+
+class BraveContentBrowserClientReferrerTest
+    : public BraveContentBrowserClientTest {
+public:
+  HostContentSettingsMap* content_settings() {
+    return HostContentSettingsMapFactory::GetForProfile(browser()->profile());
+  }
+};
+
+IN_PROC_BROWSER_TEST_F(BraveContentBrowserClientReferrerTest,
+                       DefaultBehaviour) {
+  const GURL kRequestUrl("http://request.com/path?query");
+  const GURL kDocumentUrl("http://document.com/path?query");
+
+  content::Referrer kReferrer(kDocumentUrl,
+                              network::mojom::ReferrerPolicy::kDefault);
+
+  // Should be hidden by default.
+  content::Referrer referrer = kReferrer;
+  client()->PossiblyHideReferrer(browser()->profile(),
+                                 kRequestUrl, kDocumentUrl,
+                                 &referrer);
+  EXPECT_EQ(referrer.url, kRequestUrl.GetOrigin());
+
+  // Special rule for extensions.
+  const GURL kExtensionUrl("chrome-extension://abc/path?query");
+  referrer.url = kExtensionUrl;
+  client()->PossiblyHideReferrer(browser()->profile(),
+                                 kRequestUrl, kExtensionUrl,
+                                 &referrer);
+  EXPECT_EQ(referrer.url, kExtensionUrl);
+
+  // Allow referrers for certain URL.
+  content_settings()->SetContentSettingCustomScope(
+      ContentSettingsPattern::FromString(kDocumentUrl.GetOrigin().spec() + "*"),
+      ContentSettingsPattern::Wildcard(),
+      CONTENT_SETTINGS_TYPE_PLUGINS,
+      brave_shields::kReferrers, CONTENT_SETTING_ALLOW);
+  referrer = kReferrer;
+  client()->PossiblyHideReferrer(browser()->profile(),
+                                 kRequestUrl, kDocumentUrl,
+                                 &referrer);
+  EXPECT_EQ(referrer.url, kDocumentUrl);
 }
